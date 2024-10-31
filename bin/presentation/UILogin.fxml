@@ -7,9 +7,9 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: green;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="business.UILoginController">
     <children>
@@ -27,13 +27,14 @@
                         </ImageView>
                     </StackPane>
                     
-                    <!-- Input fields with same width -->
-                    <TextField fx:id="tfID" promptText="CEDULA" style="-fx-pref-width: 300; -fx-background-radius: 5;" />
+                    <!-- Input fields -->
+                    <TextField fx:id="tfID" prefHeight="25.0" prefWidth="328.0" promptText="CEDULA" style="-fx-pref-width: 300; -fx-background-radius: 5;" />
 
+                    <!-- Password Field with Toggle Button -->
                     <HBox alignment="CENTER_RIGHT" style="-fx-pref-width: 300;">
-                        <PasswordField fx:id="tfPassword" promptText="CONTRASEÑA" style="-fx-pref-width: 300; -fx-background-radius: 5;" />
-                        <TextField fx:id="tfVisiblePassword" promptText="CONTRASEÑA" style="-fx-pref-width: 300; -fx-background-radius: 5;" managed="false" visible="false" />
-                        <Button fx:id="bTogglePassword" onAction="#togglePasswordVisibility" text="👁" style="-fx-background-color: transparent;" />
+                        <PasswordField fx:id="tfPassword" prefHeight="25.0" prefWidth="325.0" promptText="CONTRASEÑA" style="-fx-pref-width: 300; -fx-background-radius: 5;" />
+                        <TextField fx:id="tfVisiblePassword" managed="false" promptText="CONTRASEÑA" style="-fx-pref-width: 300; -fx-background-radius: 5;" visible="false" />
+                        <Button fx:id="bTogglePassword" onAction="#togglePasswordVisibility" style="-fx-background-color: transparent;" text="👁" />
                     </HBox>
 
                     <!-- Login Button -->
@@ -44,4 +45,3 @@
         <Button fx:id="bRegister" layoutX="473.0" layoutY="361.0" onAction="#saveRegister" style="-fx-background-color: #2A2E37; -fx-text-fill: #FFFFFF; -fx-background-radius: 20; -fx-pref-width: 100;" text="REGISTRAR" />
     </children>
 </AnchorPane>
-
