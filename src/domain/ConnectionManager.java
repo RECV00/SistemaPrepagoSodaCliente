@@ -8,7 +8,7 @@ import java.net.Socket;
 
 public class ConnectionManager {
 
-    private static final String HOST_SERVER = "localhost";
+    private static final String HOST_SERVER = "192.168.100.19";
     private static final int PORT = 12348;
 
     private PrintWriter salida;

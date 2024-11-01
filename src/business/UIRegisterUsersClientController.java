@@ -31,7 +31,7 @@ public class UIRegisterUsersClientController {
 
 	    @FXML
 	    private void initialize() {
-	        cbType.getItems().addAll("Administrador", "Usuario Regular"); // Ejemplo de opciones
+	        cbType.getItems().addAll("Personal", "Estudiante"); // Ejemplo de opciones
 	    }
 
 	    @FXML

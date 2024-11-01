@@ -79,7 +79,7 @@ public class UILoginController {
                 processServerMessage(mensajeServidor);
             }
         } catch (IOException e) {
-            updateResponse("Error al recibir datos del servidor: " + e.getMessage());
+        	System.out.println("Error al recibir datos del servidor: " + e.getMessage());
         }
     }
 
@@ -92,7 +92,7 @@ public class UILoginController {
                 if ("SUCCESS".equals(status)) {
                     openServiceRequestWindow(parts[1]); // userID como parte del mensaje
                 } else {
-                    updateResponse("Autenticación fallida: " + parts[1]);
+                	System.out.println("Autenticación fallida: " + parts[1]);
                 }
             }
         });
@@ -117,7 +117,7 @@ public class UILoginController {
             currentStage.close();
         } catch (IOException e) {
             e.printStackTrace();
-            updateResponse("Error al abrir la ventana de solicitud de servicio.");
+            System.out.println("Error al abrir la ventana de solicitud de servicio.");
         }
     }
 
@@ -145,12 +145,12 @@ public class UILoginController {
                 
                 if (userID != null && password != null && userType != null) {
                     connectionManager.sendRegister(userID, password, userType, profilePhotoPath);
-                    updateResponse("Registro enviado al servidor.");
+                    System.out.println("Registro enviado al servidor.");
                 }
             });
 
         } catch (IOException e) {
-            updateResponse("Error al abrir la ventana de registro: " + e.getMessage());
+        	System.out.println("Error al abrir la ventana de registro: " + e.getMessage());
         }
     }
 

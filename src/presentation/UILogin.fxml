@@ -39,6 +39,9 @@
 
                     <!-- Login Button -->
                     <Button fx:id="bLogin" onAction="#onLogin" style="-fx-background-color: #2A2E37; -fx-text-fill: #FFFFFF; -fx-background-radius: 20; -fx-pref-width: 100;" text="LOGIN" />
+
+                    <!-- Response Label -->
+                    <Label fx:id="lblResponse" style="-fx-text-fill: red;" /> <!-- Este es el nuevo Label para mostrar mensajes -->
                 </VBox>
             </children>
         </StackPane>
