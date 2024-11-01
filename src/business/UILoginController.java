@@ -27,12 +27,12 @@ public class UILoginController {
     @FXML
     private TextField tfVisiblePassword;
     @FXML
+    private TextField tfServerIP; 
+    @FXML
     private Button bTogglePassword;
     @FXML
     private Button bLogin;
-    @FXML
-    private Button bRegister;
-
+   
     private boolean isPasswordVisible = false;
 
     // Etiqueta para mostrar mensajes de respuesta
@@ -41,10 +41,7 @@ public class UILoginController {
 
     @FXML
     private void initialize() {
-        // Sincronizar el texto entre los dos campos al iniciar
         tfVisiblePassword.textProperty().bindBidirectional(tfPassword.textProperty());
-        connectionManager = new ConnectionManager();
-        connectionManager.connect(); // Intentar conectarse al servidor
     }
 
     @FXML
@@ -61,14 +58,20 @@ public class UILoginController {
     private void onLogin() {
         String userID = tfID.getText().trim();
         String password = tfPassword.getText();
+        String serverIP = tfServerIP.getText().trim(); // Obtiene la IP ingresada
 
-        if (userID.isEmpty() || password.isEmpty()) {
+        if (userID.isEmpty() || password.isEmpty() || serverIP.isEmpty()) {
             updateResponse("Por favor, complete todos los campos.");
             return;
         }
 
-        connectionManager.sendLogin(userID, password);
-        new Thread(() -> listenForServerMessages()).start(); // Inicia un hilo para escuchar mensajes
+        connectionManager = new ConnectionManager(serverIP); // Pasa la IP al ConnectionManager
+        if (connectionManager.connect()) {
+            connectionManager.sendLogin(userID, password);
+            new Thread(this::listenForServerMessages).start();
+        } else {
+            updateResponse("Error de conexión con el servidor.");
+        }
     }
 
     private void listenForServerMessages() {
@@ -79,7 +82,7 @@ public class UILoginController {
                 processServerMessage(mensajeServidor);
             }
         } catch (IOException e) {
-        	System.out.println("Error al recibir datos del servidor: " + e.getMessage());
+            System.out.println("Error al recibir datos del servidor: " + e.getMessage());
         }
     }
 
@@ -90,9 +93,9 @@ public class UILoginController {
             if (parts.length > 0) {
                 String status = parts[0];
                 if ("SUCCESS".equals(status)) {
-                    openServiceRequestWindow(parts[1]); // userID como parte del mensaje
+                    openServiceRequestWindow(parts[1]);
                 } else {
-                	System.out.println("Autenticación fallida: " + parts[1]);
+                    updateResponse("Autenticación fallida: " + parts[1]);
                 }
             }
         });
@@ -103,54 +106,21 @@ public class UILoginController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/presentation/UIServiceRequest.fxml"));
             Parent root = loader.load();
 
-            // Obtener el controlador y pasar datos
+            // Obtener el controlador de la ventana de solicitud de servicio
             UIServiceRequestController controller = loader.getController();
-            //controller.initializeData(userID);
-
+            // Pasar el userID y el serverIP al controlador
+            controller.initializeData(userID, connectionManager.getServerIP());
+            // Mostrar la nueva ventana
             Stage stage = new Stage();
             stage.setTitle("Service Request");
             stage.setScene(new Scene(root));
             stage.show();
-
-            // Cerrar ventana de inicio de sesión
+            // Cerrar la ventana de inicio de sesión actual
             Stage currentStage = (Stage) bLogin.getScene().getWindow();
             currentStage.close();
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Error al abrir la ventana de solicitud de servicio.");
-        }
-    }
-
-    @FXML
-    private void saveRegister() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/presentation/UIRegisterUsersClient.fxml"));
-            Parent root = loader.load();
-
-            // Obtener el controlador para la ventana de registro
-            UIRegisterUsersClientController registerController = loader.getController();
-            
-            Stage stage = new Stage();
-            stage.setTitle("Registrar Nuevo Usuario");
-            stage.setScene(new Scene(root));
-            stage.show();
-            
-            // Esperar hasta que se cierre la ventana de registro para continuar
-            stage.setOnHiding(event -> {
-                // Recoge los datos de registro y envíalos si no están vacíos
-                String userID = registerController.getUserID();
-                String password = registerController.getPassword();
-                String userType = registerController.getUserType();
-                String profilePhotoPath = registerController.getPhotoPath();
-                
-                if (userID != null && password != null && userType != null) {
-                    connectionManager.sendRegister(userID, password, userType, profilePhotoPath);
-                    System.out.println("Registro enviado al servidor.");
-                }
-            });
-
-        } catch (IOException e) {
-        	System.out.println("Error al abrir la ventana de registro: " + e.getMessage());
         }
     }
 

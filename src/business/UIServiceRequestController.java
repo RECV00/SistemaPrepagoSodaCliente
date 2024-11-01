@@ -13,10 +13,9 @@ import java.util.List;
 
 public class UIServiceRequestController {
 
-    private ConnectionManager connectionManager;
-
-    @FXML
-    private ComboBox<String> cbEstudiante;
+	private ConnectionManager connectionManager;
+    private String userCedula;
+    
     @FXML
     private ComboBox<String> cbDiaReservacion;
     @FXML
@@ -39,96 +38,101 @@ public class UIServiceRequestController {
     private Button bAgregarAlimento;
 
     private ObservableList<Dishe> dishesList;
-    private ObservableList<String> estudiantesList;
 
+    public void initializeData(String userID, String hostServer) {
+        this.userCedula = userID;
+
+        connectionManager = new ConnectionManager(hostServer);
+        new Thread(() -> {
+            if (connectionManager.connect()) {
+                Platform.runLater(this::setupTableAndData);
+            } else {
+                Platform.runLater(() -> showAlert("No se pudo conectar al SODA."));
+            }
+        }).start();
+    }
+    
     @FXML
     private void initialize() {
-        connectionManager = new ConnectionManager();
-        connectionManager.connect();
-
-        // Configuración inicial de las columnas de la tabla
         colAlimento.setCellValueFactory(new PropertyValueFactory<>("name"));
         colPrecio.setCellValueFactory(new PropertyValueFactory<>("price"));
         colSolicitar.setCellValueFactory(new PropertyValueFactory<>("select"));
 
         dishesList = FXCollections.observableArrayList();
-        estudiantesList = FXCollections.observableArrayList();
         tableDishes.setItems(dishesList);
-        cbEstudiante.setItems(estudiantesList);
-        cbDiaReservacion.getItems().addAll("Lunes","Martes","Miércoles","Jueves","Viernes");
-
-        // Solicitar lista de estudiantes al servidor
-        requestStudentList();
+        cbDiaReservacion.getItems().addAll("Lunes", "Martes", "Miércoles", "Jueves", "Viernes");
     }
-
-    private void requestStudentList() {
-        // Enviar solicitud para obtener la lista de estudiantes
-        connectionManager.sendMessage("GET_STUDENT_LIST");
-        
-        // Escuchar la respuesta del servidor en un hilo aparte
-        new Thread(this::listenForServerMessages).start();
+    
+    private void setupTableAndData() {
+        requestDishList();
     }
-
+    
+    private void requestDishList() {
+        connectionManager.sendMessage("GET_DISH_LIST");
+        listenForServerMessages();
+    }
+    
     private void listenForServerMessages() {
-        String mensajeServidor;
-        while ((mensajeServidor = connectionManager.receiveMessage()) != null) {
-            processServerMessage(mensajeServidor);
-        }
+        new Thread(() -> {
+            String mensajeServidor;
+            while ((mensajeServidor = connectionManager.receiveMessage()) != null) {
+                processServerMessage(mensajeServidor);
+            }
+            Platform.runLater(() -> showAlert("Conexión con el servidor finalizada."));
+        }).start();
     }
 
     private void processServerMessage(String mensajeServidor) {
         Platform.runLater(() -> {
             String[] parts = mensajeServidor.split(",");
-            switch (parts[0]) {
-                case "STUDENT_LIST":
-                    estudiantesList.clear();
-                    for (int i = 1; i < parts.length; i++) {
-                        estudiantesList.add(parts[i]);
-                    }
-                    break;
-                case "DISH_LIST":
-                    dishesList.clear();
-                    for (int i = 1; i < parts.length; i += 2) {
-                        String name = parts[i];
-                        double price = Double.parseDouble(parts[i + 1]);
-                        dishesList.add(new Dishe(name, price, new CheckBox()));
-                    }
-                    break;
+            if ("DISH_LIST".equals(parts[0])) {
+                dishesList.clear();
+                for (int i = 1; i < parts.length; i += 2) {
+                    String name = parts[i];
+                    double price = Double.parseDouble(parts[i + 1]);
+                    dishesList.add(new Dishe(name, price, new CheckBox()));
+                }
             }
         });
     }
 
-    // Método para cargar los platos según el día y horario
     @FXML
     private void loadDishes() {
         String diaSeleccionado = cbDiaReservacion.getValue();
-        String horarioSeleccionado = rbDesayuno.isSelected() ? "Desayuno" : "Almuerzo";
-        
+        String horarioSeleccionado = rbDesayuno.isSelected() ? "Desayuno" : rbAlmuerzo.isSelected() ? "Almuerzo" : null;
+
+        if (diaSeleccionado == null || horarioSeleccionado == null) {
+            showAlert("Por favor, seleccione un día y un horario.");
+            return;
+        }
+
         connectionManager.sendReservationRequest(diaSeleccionado, horarioSeleccionado);
     }
 
     @FXML
     private void confirmPurchase() {
-        String estudiante = cbEstudiante.getValue();
         List<Dishe> selectedDishes = dishesList.filtered(dish -> dish.getSelect().isSelected());
-
-        if (estudiante == null || selectedDishes.isEmpty()) {
-            showAlert("Por favor, seleccione un estudiante y al menos un alimento.");
+        if (selectedDishes.isEmpty()) {
+            showAlert("Por favor, seleccione al menos un alimento.");
             return;
         }
-
-        double total = 0; // Variable para acumular el total de los platillos seleccionados
-        StringBuilder request = new StringBuilder("PURCHASE," + estudiante);
+        double total = 0;
+        StringBuilder request = new StringBuilder("PURCHASE," + userCedula); // Incluye el userID al inicio del mensaje
 
         for (Dishe dish : selectedDishes) {
             request.append(",").append(dish.getName());
-            total += dish.getPrice(); // Sumar el precio del platillo seleccionado
+            total += dish.getPrice();
         }
-
-        // Agregar el total a la solicitud
         request.append(",").append(total);
-
+        // Envía el mensaje de compra al servidor
         connectionManager.sendMessage(request.toString());
+    }
+
+    @FXML
+    private void closeConnectionOnExit() {
+        if (connectionManager != null) {
+            connectionManager.close();
+        }
     }
 
     private void showAlert(String message) {

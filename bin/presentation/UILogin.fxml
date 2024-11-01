@@ -30,6 +30,9 @@
                     <!-- Input fields -->
                     <TextField fx:id="tfID" prefHeight="25.0" prefWidth="328.0" promptText="CEDULA" style="-fx-pref-width: 300; -fx-background-radius: 5;" />
 
+                    <!-- New IP Input Field -->
+                    <TextField fx:id="tfServerIP" prefHeight="25.0" prefWidth="328.0" promptText="IP ADDRESS" style="-fx-pref-width: 300; -fx-background-radius: 5;" />
+
                     <!-- Password Field with Toggle Button -->
                     <HBox alignment="CENTER_RIGHT" style="-fx-pref-width: 300;">
                         <PasswordField fx:id="tfPassword" prefHeight="25.0" prefWidth="325.0" promptText="CONTRASEÑA" style="-fx-pref-width: 300; -fx-background-radius: 5;" />
@@ -45,6 +48,5 @@
                 </VBox>
             </children>
         </StackPane>
-        <Button fx:id="bRegister" layoutX="473.0" layoutY="361.0" onAction="#saveRegister" style="-fx-background-color: #2A2E37; -fx-text-fill: #FFFFFF; -fx-background-radius: 20; -fx-pref-width: 100;" text="REGISTRAR" />
     </children>
 </AnchorPane>

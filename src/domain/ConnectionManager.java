@@ -8,17 +8,25 @@ import java.net.Socket;
 
 public class ConnectionManager {
 
-    private static final String HOST_SERVER = "192.168.100.19";
+	private String hostServer;
     private static final int PORT = 12348;
 
     private PrintWriter salida;
     private BufferedReader entrada;
     private Socket socket;
     private boolean isConnected = false;
-
+    
+    public ConnectionManager(String hostServer) {
+        this.hostServer = hostServer;
+    }
+    
+    public String getServerIP() {
+        return hostServer;
+    }
+    
     public boolean connect() {
         try {
-            socket = new Socket(HOST_SERVER, PORT);
+            socket = new Socket(hostServer, PORT);
             entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             salida = new PrintWriter(socket.getOutputStream(), true);
             isConnected = true;
@@ -35,11 +43,7 @@ public class ConnectionManager {
         }
     }
 
-    public void sendRegister(String userID, String password, String userType, String profilePhotoPath) {
-        String message = "REGISTER," + userID + "," + password + "," + userType + "," + profilePhotoPath;
-        salida.println(message);
-    }
-
+  
     public BufferedReader getEntrada() {
         return entrada;
     }
@@ -53,7 +57,6 @@ public class ConnectionManager {
             salida.println(message);
         }
     }
-
     public String receiveMessage() {
         try {
             if (isConnected && entrada != null) {

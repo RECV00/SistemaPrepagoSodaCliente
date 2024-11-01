@@ -22,17 +22,13 @@
         <!-- Título -->
         <Label layoutX="20.0" layoutY="10.0" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Servicio de Solicitud de Alimentos" />
         
-        <!-- Selección de Estudiante -->
-        <Label layoutX="20.0" layoutY="50.0" text="Estudiante:" />
-        <ComboBox fx:id="cbEstudiante" layoutX="100.0" layoutY="50.0" prefWidth="200.0" />
-
         <!-- Selección del Día de Reservación -->
-        <Label layoutX="20.0" layoutY="100.0" text="Día de Reservación:" />
-        <ComboBox fx:id="cbDiaReservacion" layoutX="150.0" layoutY="100.0" prefWidth="150.0" />
+        <Label layoutX="20.0" layoutY="51.0" text="Día de Reservación:" />
+        <ComboBox fx:id="cbDiaReservacion" layoutX="139.0" layoutY="47.0" prefWidth="150.0" />
 
         <!-- Selección de Horario (Desayuno o Almuerzo) -->
-        <Label layoutX="462.0" layoutY="42.0" text="Horario de la reserva:" />
-        <RadioButton fx:id="rbDesayuno" layoutX="444.0" layoutY="68.0" mnemonicParsing="false" text="Desayuno">
+        <Label layoutX="20.0" layoutY="97.0" text="Horario de la reserva:" />
+        <RadioButton fx:id="rbDesayuno" layoutX="149.0" layoutY="97.0" mnemonicParsing="false" text="Desayuno">
 			<toggleGroup>
 				<ToggleGroup fx:id="Tipo" />
 			</toggleGroup>
@@ -40,21 +36,21 @@
             <Font name="System Bold Italic" size="12.0" />
          </font>
 		</RadioButton>
-		<RadioButton fx:id="rbAlmuerzo" layoutX="536.0" layoutY="67.0" mnemonicParsing="false" text="Almuerzo" toggleGroup="$Tipo">
+		<RadioButton fx:id="rbAlmuerzo" layoutX="239.0" layoutY="97.0" mnemonicParsing="false" text="Almuerzo" toggleGroup="$Tipo">
          <font>
             <Font name="System Bold Italic" size="12.0" />
          </font></RadioButton>
         <!-- Tabla de Platos -->
-        <TableView fx:id="tableDishes" layoutX="20.0" layoutY="146.0" opacity="0.78" prefHeight="200.0" prefWidth="537.0">
+        <TableView fx:id="tableDishes" layoutX="42.0" layoutY="148.0" opacity="0.78" prefHeight="200.0" prefWidth="547.0">
             <columns>
-                <TableColumn fx:id="colAlimento" prefWidth="200.0" text="Alimento" />
-                <TableColumn fx:id="colPrecio" prefWidth="210.0" text="Precio" />
-                <TableColumn fx:id="colSolicitar" prefWidth="126.0" text="Seleccionar" />
+                <TableColumn fx:id="colAlimento" prefWidth="204.0" text="Alimento" />
+                <TableColumn fx:id="colPrecio" prefWidth="206.0" text="Precio" />
+                <TableColumn fx:id="colSolicitar" prefWidth="136.0" text="Seleccionar" />
             </columns>
         </TableView>
 
         <!-- Botones -->
         <Button fx:id="bAgregarAlimento" layoutX="20.0" layoutY="366.0" onAction="#loadDishes" text="Cargar Platos" />
-        <Button fx:id="bRegresar" layoutX="124.0" layoutY="366.0" onAction="#confirmPurchase" text="Regresar" />
+        <Button fx:id="bRegresar" layoutX="536.0" layoutY="366.0" onAction="#confirmPurchase" text="Regresar" />
     </children>
 </AnchorPane>
