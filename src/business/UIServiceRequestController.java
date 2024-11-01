@@ -114,11 +114,17 @@ public class UIServiceRequestController {
             return;
         }
 
+        double total = 0; // Variable para acumular el total de los platillos seleccionados
         StringBuilder request = new StringBuilder("PURCHASE," + estudiante);
+
         for (Dishe dish : selectedDishes) {
             request.append(",").append(dish.getName());
+            total += dish.getPrice(); // Sumar el precio del platillo seleccionado
         }
-        
+
+        // Agregar el total a la solicitud
+        request.append(",").append(total);
+
         connectionManager.sendMessage(request.toString());
     }
 

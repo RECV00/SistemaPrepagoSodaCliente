@@ -7,79 +7,38 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity"
-	minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
-	prefWidth="671.0" xmlns="http://javafx.com/javafx/21"
-	xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="business.UIServiceRequestController">
-	<children>
-		<ImageView fitHeight="400.0" fitWidth="671.0">
-			<image>
-				<Image url="@../../imagen/una 2.jpg" />
-			</image>
-		</ImageView>
-		<Label layoutX="14.0" layoutY="31.0" text="Estudiante">
-			<font>
-				<Font name="System Bold Italic" size="13.0" />
-			</font>
-		</Label>
-		<Label layoutX="272.0" layoutY="31.0"
-			text="Selecione el día para reservar:">
-			<font>
-				<Font name="System Bold Italic" size="13.0" />
-			</font>
-		</Label>
-		<Label layoutX="473.0" layoutY="31.0"
-			text="Horario de la reservación">
-			<font>
-				<Font name="System Bold Italic" size="13.0" />
-			</font>
-		</Label>
-		<ComboBox fx:id="cbStudentsList" layoutX="14.0"
-			layoutY="64.0" opacity="0.68" prefHeight="25.0" prefWidth="245.0"
-			promptText="Selecione el Estudiante" />
-		<ComboBox fx:id="cbServiceDay" layoutX="272.0" layoutY="64.0"
-			opacity="0.6" prefHeight="25.0" prefWidth="189.0"
-			promptText="Selecione el día de reservar" />
-		<RadioButton fx:id="rbBreakfastDishe" layoutX="473.0"
-			layoutY="68.0" mnemonicParsing="false" text="Desayuno">
-			<toggleGroup>
-				<ToggleGroup fx:id="Tipo" />
-			</toggleGroup>
-			<font>
-				<Font name="System Bold Italic" size="12.0" />
-			</font>
-		</RadioButton>
-		<RadioButton fx:id="rbLunchDishe" layoutX="557.0"
-			layoutY="68.0" mnemonicParsing="false" text="Almuerzo"
-			toggleGroup="$Tipo">
-			<font>
-				<Font name="System Bold Italic" size="12.0" />
-			</font>
-		</RadioButton>
-		<TableView fx:id="tvDisheData" layoutX="14.0"
-			layoutY="111.0" opacity="0.74" prefHeight="200.0" prefWidth="647.0">
-			<columns>
-				<TableColumn fx:id="tcDataDishe" prefWidth="480.0"
-					text="Alimento" />
-				<TableColumn fx:id="tcPriceDishe" minWidth="0.0"
-					prefWidth="79.0" text="Precio" />
-				<TableColumn fx:id="tcRequestDishe" prefWidth="86.0"
-					text="Solicitar" />
-			</columns>
-		</TableView>
-		<Button fx:id="btnRegisterDishe" layoutX="493.0"
-			layoutY="349.0" mnemonicParsing="false" onAction="#registerNewDishe"
-			prefHeight="25.0" prefWidth="157.0" text="Agregar nuevo Alimento" />
-		<Button fx:id="btnBack" layoutX="404.0" layoutY="349.0"
-			mnemonicParsing="false" onAction="#returnUIStart" prefHeight="25.0"
-			prefWidth="69.0" text="Regresar" />
-		<Label fx:id="lErrorVa" layoutX="34.0" layoutY="325.0"
-			prefHeight="17.0" prefWidth="531.0" textFill="#f20707" />
-	</children>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21" fx:controller="business.UIServiceRequestController">
+    <children>
+        <!-- Título -->
+        <Label text="Servicio de Solicitud de Alimentos" layoutX="20.0" layoutY="10.0" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+        
+        <!-- Selección de Estudiante -->
+        <Label text="Estudiante:" layoutX="20.0" layoutY="50.0" />
+        <ComboBox fx:id="cbEstudiante" layoutX="100.0" layoutY="50.0" prefWidth="200.0" />
+
+        <!-- Selección del Día de Reservación -->
+        <Label text="Día de Reservación:" layoutX="20.0" layoutY="100.0" />
+        <ComboBox fx:id="cbDiaReservacion" layoutX="150.0" layoutY="100.0" prefWidth="150.0" />
+
+        <!-- Selección de Horario (Desayuno o Almuerzo) -->
+        <Label text="Horario:" layoutX="20.0" layoutY="150.0" />
+        <ToggleGroup fx:id="horarioGroup" />
+        <RadioButton fx:id="rbDesayuno" text="Desayuno" layoutX="100.0" layoutY="150.0" toggleGroup="$horarioGroup" />
+        <RadioButton fx:id="rbAlmuerzo" text="Almuerzo" layoutX="200.0" layoutY="150.0" toggleGroup="$horarioGroup" />
+
+        <!-- Tabla de Platos -->
+        <TableView fx:id="tableDishes" layoutX="20.0" layoutY="200.0" prefHeight="200.0" prefWidth="400.0">
+            <columns>
+                <TableColumn fx:id="colAlimento" text="Alimento" prefWidth="200.0" />
+                <TableColumn fx:id="colPrecio" text="Precio" prefWidth="100.0" />
+                <TableColumn fx:id="colSolicitar" text="Seleccionar" prefWidth="100.0" />
+            </columns>
+        </TableView>
+
+        <!-- Botones -->
+        <Button fx:id="bAgregarAlimento" text="Cargar Platos" layoutX="20.0" layoutY="420.0" onAction="#loadDishes" />
+        <Button fx:id="bRegresar" text="Regresar" layoutX="120.0" layoutY="420.0" onAction="#confirmPurchase" />
+    </children>
 </AnchorPane>
