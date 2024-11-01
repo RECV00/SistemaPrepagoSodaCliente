@@ -100,7 +100,7 @@ public class UILoginController {
 
     private void openServiceRequestWindow(String userID) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/presentation/UIProfile.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/presentation/UIServiceRequest.fxml"));
             Parent root = loader.load();
 
             // Obtener el controlador y pasar datos

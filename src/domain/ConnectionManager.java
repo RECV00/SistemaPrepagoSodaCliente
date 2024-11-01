@@ -48,12 +48,42 @@ public class ConnectionManager {
         return isConnected;
     }
 
+    public void sendMessage(String message) {
+        if (isConnected && salida != null) {
+            salida.println(message);
+        }
+    }
+
+    public String receiveMessage() {
+        try {
+            if (isConnected && entrada != null) {
+                return entrada.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Método para enviar una solicitud de reservación al servidor
+    public void sendReservationRequest(String dia, String horario) {
+        String message = "LOAD_DISHES," + dia + "," + horario;
+        sendMessage(message);
+    }
+
+   
     public void close() {
         try {
+            isConnected = false;
+            if (salida != null) {
+                salida.close();
+            }
+            if (entrada != null) {
+                entrada.close();
+            }
             if (socket != null) {
                 socket.close();
             }
-            isConnected = false;
         } catch (IOException e) {
             e.printStackTrace();
         }

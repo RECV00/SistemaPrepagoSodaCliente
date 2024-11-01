@@ -20,7 +20,7 @@
 	<children>
 		<ImageView fitHeight="400.0" fitWidth="671.0">
 			<image>
-				<Image url="@../../media/una%202.jpg" />
+				<Image url="@../../imagen/una 2.jpg" />
 			</image>
 		</ImageView>
 		<Label layoutX="14.0" layoutY="31.0" text="Estudiante">
