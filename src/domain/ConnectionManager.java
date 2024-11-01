@@ -35,10 +35,9 @@ public class ConnectionManager {
         }
     }
 
-    public void sendRegister(String userID, String password) {
-        if (isConnected) {
-            salida.println("REGISTER," + userID + "," + password);
-        }
+    public void sendRegister(String userID, String password, String userType, String profilePhotoPath) {
+        String message = "REGISTER," + userID + "," + password + "," + userType + "," + profilePhotoPath;
+        salida.println(message);
     }
 
     public BufferedReader getEntrada() {

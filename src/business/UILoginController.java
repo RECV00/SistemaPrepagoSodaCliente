@@ -123,27 +123,47 @@ public class UILoginController {
 
     @FXML
     private void saveRegister() {
-        String userID = tfID.getText().trim();
-        String password = tfPassword.getText();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/presentation/UIRegisterUsersClient.fxml"));
+            Parent root = loader.load();
 
-        if (userID.isEmpty() || password.isEmpty()) {
-            updateResponse("Por favor, complete todos los campos.");
-            return;
+            // Obtener el controlador para la ventana de registro
+            UIRegisterUsersClientController registerController = loader.getController();
+            
+            Stage stage = new Stage();
+            stage.setTitle("Registrar Nuevo Usuario");
+            stage.setScene(new Scene(root));
+            stage.show();
+            
+            // Esperar hasta que se cierre la ventana de registro para continuar
+            stage.setOnHiding(event -> {
+                // Recoge los datos de registro y envíalos si no están vacíos
+                String userID = registerController.getUserID();
+                String password = registerController.getPassword();
+                String userType = registerController.getUserType();
+                String profilePhotoPath = registerController.getPhotoPath();
+                
+                if (userID != null && password != null && userType != null) {
+                    connectionManager.sendRegister(userID, password, userType, profilePhotoPath);
+                    updateResponse("Registro enviado al servidor.");
+                }
+            });
+
+        } catch (IOException e) {
+            updateResponse("Error al abrir la ventana de registro: " + e.getMessage());
         }
-
-        connectionManager.sendRegister(userID, password);
     }
 
     public void updateResponse(String message) {
         Platform.runLater(() -> {
-            lblResponse.setText(message); // Mostrar el mensaje en la etiqueta
+            lblResponse.setText(message);
             System.out.println(message);
         });
     }
 
     @FXML
     protected void finalize() throws Throwable {
-        connectionManager.close(); // Cerrar conexión al final
+        connectionManager.close();
         super.finalize();
     }
 }
