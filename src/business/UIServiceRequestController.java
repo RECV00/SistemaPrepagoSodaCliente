@@ -22,6 +22,8 @@ public class UIServiceRequestController {
     @FXML
     private RadioButton rbDesayuno;
     @FXML
+    private ToggleGroup Tipo;
+    @FXML
     private RadioButton rbAlmuerzo;
     @FXML
     private TableView<Dishe> tableDishes;
@@ -53,6 +55,7 @@ public class UIServiceRequestController {
         estudiantesList = FXCollections.observableArrayList();
         tableDishes.setItems(dishesList);
         cbEstudiante.setItems(estudiantesList);
+        cbDiaReservacion.getItems().addAll("Lunes","Martes","Miércoles","Jueves","Viernes");
 
         // Solicitar lista de estudiantes al servidor
         requestStudentList();

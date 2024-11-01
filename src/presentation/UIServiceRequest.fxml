@@ -7,38 +7,54 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21" fx:controller="business.UIServiceRequestController">
+<AnchorPane prefHeight="417.0" prefWidth="621.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="business.UIServiceRequestController">
     <children>
+      <ImageView fitHeight="417.0" fitWidth="621.0">
+         <image>
+            <Image url="@../../imagen/una%202.jpg" />
+         </image>
+      </ImageView>
         <!-- Título -->
-        <Label text="Servicio de Solicitud de Alimentos" layoutX="20.0" layoutY="10.0" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+        <Label layoutX="20.0" layoutY="10.0" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Servicio de Solicitud de Alimentos" />
         
         <!-- Selección de Estudiante -->
-        <Label text="Estudiante:" layoutX="20.0" layoutY="50.0" />
+        <Label layoutX="20.0" layoutY="50.0" text="Estudiante:" />
         <ComboBox fx:id="cbEstudiante" layoutX="100.0" layoutY="50.0" prefWidth="200.0" />
 
         <!-- Selección del Día de Reservación -->
-        <Label text="Día de Reservación:" layoutX="20.0" layoutY="100.0" />
+        <Label layoutX="20.0" layoutY="100.0" text="Día de Reservación:" />
         <ComboBox fx:id="cbDiaReservacion" layoutX="150.0" layoutY="100.0" prefWidth="150.0" />
 
         <!-- Selección de Horario (Desayuno o Almuerzo) -->
-        <Label text="Horario:" layoutX="20.0" layoutY="150.0" />
-        <ToggleGroup fx:id="horarioGroup" />
-        <RadioButton fx:id="rbDesayuno" text="Desayuno" layoutX="100.0" layoutY="150.0" toggleGroup="$horarioGroup" />
-        <RadioButton fx:id="rbAlmuerzo" text="Almuerzo" layoutX="200.0" layoutY="150.0" toggleGroup="$horarioGroup" />
-
+        <Label layoutX="462.0" layoutY="42.0" text="Horario de la reserva:" />
+        <RadioButton fx:id="rbDesayuno" layoutX="444.0" layoutY="68.0" mnemonicParsing="false" text="Desayuno">
+			<toggleGroup>
+				<ToggleGroup fx:id="Tipo" />
+			</toggleGroup>
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font>
+		</RadioButton>
+		<RadioButton fx:id="rbAlmuerzo" layoutX="536.0" layoutY="67.0" mnemonicParsing="false" text="Almuerzo" toggleGroup="$Tipo">
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font></RadioButton>
         <!-- Tabla de Platos -->
-        <TableView fx:id="tableDishes" layoutX="20.0" layoutY="200.0" prefHeight="200.0" prefWidth="400.0">
+        <TableView fx:id="tableDishes" layoutX="20.0" layoutY="146.0" opacity="0.78" prefHeight="200.0" prefWidth="537.0">
             <columns>
-                <TableColumn fx:id="colAlimento" text="Alimento" prefWidth="200.0" />
-                <TableColumn fx:id="colPrecio" text="Precio" prefWidth="100.0" />
-                <TableColumn fx:id="colSolicitar" text="Seleccionar" prefWidth="100.0" />
+                <TableColumn fx:id="colAlimento" prefWidth="200.0" text="Alimento" />
+                <TableColumn fx:id="colPrecio" prefWidth="210.0" text="Precio" />
+                <TableColumn fx:id="colSolicitar" prefWidth="126.0" text="Seleccionar" />
             </columns>
         </TableView>
 
         <!-- Botones -->
-        <Button fx:id="bAgregarAlimento" text="Cargar Platos" layoutX="20.0" layoutY="420.0" onAction="#loadDishes" />
-        <Button fx:id="bRegresar" text="Regresar" layoutX="120.0" layoutY="420.0" onAction="#confirmPurchase" />
+        <Button fx:id="bAgregarAlimento" layoutX="20.0" layoutY="366.0" onAction="#loadDishes" text="Cargar Platos" />
+        <Button fx:id="bRegresar" layoutX="124.0" layoutY="366.0" onAction="#confirmPurchase" text="Regresar" />
     </children>
 </AnchorPane>
