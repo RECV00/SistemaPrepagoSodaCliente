@@ -69,7 +69,7 @@ public class UIServiceRequestController {
     }
     
     private void requestDishList() {
-        connectionManager.sendMessage("GET_DISH_LIST");
+        connectionManager.sendMessage("LOAD_DISHES");
         listenForServerMessages();
     }
     
@@ -107,7 +107,7 @@ public class UIServiceRequestController {
             return;
         }
 
-        connectionManager.sendMessage("REQUEST_RESERVATION," + diaSeleccionado + "," + horarioSeleccionado);
+        connectionManager.sendMessage("LOAD_DISHES," + diaSeleccionado + "," + horarioSeleccionado);
     }
 
     @FXML
