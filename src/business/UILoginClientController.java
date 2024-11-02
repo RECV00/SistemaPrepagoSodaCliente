@@ -32,9 +32,7 @@ public class UILoginClientController {
     private Button bTogglePassword;
     @FXML
     private Button bLogin;
-   
     private boolean isPasswordVisible = false;
-
     @FXML
     private Label lblResponse;
 
