@@ -64,15 +64,30 @@ public class UIServiceRequestController {
         cbDiaReservacion.getItems().addAll("Lunes", "Martes", "Miércoles", "Jueves", "Viernes");
     }
     
+ 
     private void setupTableAndData() {
-        requestDishList();
+        requestDishList(); // Llama a requestDishList para cargar inicialmente la lista de platillos si hay selecciones válidas
     }
-    
+
     private void requestDishList() {
-        connectionManager.sendMessage("LOAD_DISHES");
-        listenForServerMessages();
+        // Verifica si hay un día seleccionado y si se ha seleccionado un horario
+        if (cbDiaReservacion.getValue() != null && Tipo.getSelectedToggle() != null) {
+            loadDishes(); // Llama a loadDishes solo si ambas selecciones son válidas
+        }
     }
-    
+
+    private void loadDishes() {
+        String diaSeleccionado = cbDiaReservacion.getValue();
+        String horarioSeleccionado = rbDesayuno.isSelected() ? "Desayuno" : rbAlmuerzo.isSelected() ? "Almuerzo" : null;
+
+        if (diaSeleccionado == null || horarioSeleccionado == null) {
+            return; // No enviar solicitud si no hay selección
+        }
+
+        connectionManager.sendMessage("LOAD_DISHES," + diaSeleccionado + "," + horarioSeleccionado);
+        listenForServerMessages(); // Escuchar mensajes del servidor después de enviar la solicitud
+    }
+
     private void listenForServerMessages() {
         new Thread(() -> {
             String mensajeServidor;
@@ -95,19 +110,6 @@ public class UIServiceRequestController {
                 }
             }
         });
-    }
-
-    @FXML
-    private void loadDishes() {
-        String diaSeleccionado = cbDiaReservacion.getValue();
-        String horarioSeleccionado = rbDesayuno.isSelected() ? "Desayuno" : rbAlmuerzo.isSelected() ? "Almuerzo" : null;
-
-        if (diaSeleccionado == null || horarioSeleccionado == null) {
-            showAlert("Por favor, seleccione un día y un horario.");
-            return;
-        }
-
-        connectionManager.sendMessage("LOAD_DISHES," + diaSeleccionado + "," + horarioSeleccionado);
     }
 
     @FXML
