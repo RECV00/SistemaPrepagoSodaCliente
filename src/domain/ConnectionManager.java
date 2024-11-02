@@ -9,7 +9,7 @@ import java.net.Socket;
 public class ConnectionManager {
 
 	private String hostServer;
-    private static final int PORT = 12349;
+    private static final int PORT = 12350;
 
     private PrintWriter salida;
     private BufferedReader entrada;
