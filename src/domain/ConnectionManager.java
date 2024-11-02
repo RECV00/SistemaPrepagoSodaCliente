@@ -39,7 +39,7 @@ public class ConnectionManager {
 
     public void sendLogin(String userID, String password) {
         if (isConnected) {
-            salida.println("LOGIN," + userID + "," + password);
+            salida.println("LOGIN" +","+ userID + "," + password);
         }
     }
 
