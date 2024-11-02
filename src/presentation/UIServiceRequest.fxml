@@ -43,7 +43,7 @@
         </TableView>
 
         <!-- Botones -->
-        <Button fx:id="bAgregarAlimento" layoutX="20.0" layoutY="366.0" onAction="#SaveDishes" text="Enviar Pedido" />
-        <Button fx:id="bRegresar" layoutX="536.0" layoutY="366.0" onAction="#confirmPurchase" text="Regresar" />
+        <Button fx:id="bBack" layoutX="493.0" layoutY="367.0" onAction="#returnLogin" text="Regresar" />
+        <Button fx:id="bSendOrder" layoutX="34.0" layoutY="367.0" onAction="#confirmPurchase" text="Enviar Pedido" />
     </children>
 </AnchorPane>
