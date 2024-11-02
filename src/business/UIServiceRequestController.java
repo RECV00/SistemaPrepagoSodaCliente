@@ -1,6 +1,7 @@
 package business;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -8,12 +9,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import domain.ConnectionManager;
-import domain.Dishe;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UIServiceRequestController {
@@ -33,19 +33,18 @@ public class UIServiceRequestController {
     @FXML
     private RadioButton rbAlmuerzo;
     @FXML
-    private TableView<Dishe> tableDishes;
+    private TableView<String> tableDishes;
     @FXML
-    private TableColumn<Dishe, String> colAlimento;
+    private TableColumn<String, String> colAlimento;
     @FXML
-    private TableColumn<Dishe, Double> colPrecio;
-    @FXML
-    private TableColumn<Dishe, CheckBox> colSolicitar;
+    private TableColumn<String, CheckBox> colSolicitar;
     @FXML
     private Button bBack;
     @FXML
     private Button bSendOrder;
 
-    private ObservableList<Dishe> dishesList;
+    private ObservableList<String> dishesList;
+    private List<CheckBox> checkBoxes;  
 
     public void initializeData(String userID, ConnectionManager connectionManager) {
         this.userID = userID;
@@ -63,27 +62,41 @@ public class UIServiceRequestController {
     
     @FXML
     private void initialize() {
-        colAlimento.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colPrecio.setCellValueFactory(new PropertyValueFactory<>("price"));
-        colSolicitar.setCellValueFactory(new PropertyValueFactory<>("select")); // Esto mostrará el CheckBox
-
         dishesList = FXCollections.observableArrayList();
+        checkBoxes = new ArrayList<>();
         tableDishes.setItems(dishesList);
-        cbDiaReservacion.getItems().addAll("Lunes", "Martes", "Miércoles", "Jueves", "Viernes");
 
+        colAlimento.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
+        colSolicitar.setCellFactory(col -> new TableCell<>() {
+            private final CheckBox checkBox = new CheckBox();
+
+            @Override
+            protected void updateItem(CheckBox item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    int index = getIndex();
+                    if (index >= 0 && index < checkBoxes.size()) {
+                        setGraphic(checkBoxes.get(index));
+                    }
+                }
+            }
+        });
+
+        cbDiaReservacion.getItems().addAll("Lunes", "Martes", "Miércoles", "Jueves", "Viernes");
         // Agregar listeners para cambios en el ComboBox y los RadioButtons
         cbDiaReservacion.setOnAction(e -> loadDishes());
         Tipo.selectedToggleProperty().addListener((observable, oldValue, newValue) -> loadDishes());
     }
     
- 
     private void setupTableAndData() {
-        requestDishList();
+        requestDishList(); 
     }
-
     private void requestDishList() {
+       
         if (cbDiaReservacion.getValue() != null && Tipo.getSelectedToggle() != null) {
-            loadDishes();
+            loadDishes(); // Llama a loadDishes solo si ambas selecciones son válidas
         }
     }
 
@@ -99,52 +112,57 @@ public class UIServiceRequestController {
         new Thread(() -> {
             String mensajeServidor;
             while ((mensajeServidor = connectionManager.receiveMessage()) != null) {
+            	System.out.print(mensajeServidor);
                 processServerMessage(mensajeServidor);
             }
             Platform.runLater(() -> showAlert("Conexión con el servidor finalizada."));
         }).start();
     }
-
     private void processServerMessage(String mensajeServidor) {
         Platform.runLater(() -> {
             String[] parts = mensajeServidor.split(",");
             if (DISH_LIST_RESPONSE.equals(parts[0])) {
-                try {
-                    dishesList.clear(); 
-                    for (int i = 1; i < parts.length; i += 2) {
-                        String name = parts[i];
-                        double price = Double.parseDouble(parts[i + 1]);
-                        CheckBox select = new CheckBox(); 
-                        dishesList.add(new Dishe(name, price, select));
-                    }
-                } catch (NumberFormatException e) {
-                    showAlert("Error al procesar los precios de los platos.");
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    showAlert("Respuesta del servidor en un formato inesperado.");
+                dishesList.clear(); // Limpiar la lista actual de platos
+                checkBoxes.clear(); // Limpiar la lista de CheckBoxes antes de agregar nuevos
+
+                for (int i = 1; i < parts.length; i += 2) {
+                    String name = parts[i];
+                    String price = parts[i + 1];
+                    String dishInfo = name + " - $" + price;
+                    dishesList.add(dishInfo);
+                    checkBoxes.add(new CheckBox()); // Añadir un CheckBox correspondiente
                 }
             }
         });
     }
+
     @FXML
     private void SaveDishes() {
     	System.out.print("Eviando pedido");
     }
     @FXML
     private void confirmPurchase() {
-        List<Dishe> selectedDishes = dishesList.filtered(dish -> dish.getSelect().isSelected());
-        if (selectedDishes.isEmpty()) {
+        StringBuilder request = new StringBuilder(PURCHASE_REQUEST + userID);
+        double total = 0;
+        boolean hasSelection = false;
+
+        for (int i = 0; i < dishesList.size(); i++) {
+            if (checkBoxes.get(i).isSelected()) {
+                hasSelection = true;
+                String[] dishDetails = dishesList.get(i).split(" - \\$");
+                String name = dishDetails[0];
+                double price = Double.parseDouble(dishDetails[1]);
+                request.append(",").append(name);
+                total += price;
+            }
+        }
+
+        if (!hasSelection) {
             showAlert("Por favor, seleccione al menos un alimento.");
             return;
         }
-        double total = 0;
-        StringBuilder request = new StringBuilder(PURCHASE_REQUEST + "," + userID);
 
-        for (Dishe dish : selectedDishes) {
-            request.append(",").append(dish.getName());
-            total += dish.getPrice();
-        }
         request.append(",").append(total);
-
         connectionManager.sendMessage(request.toString());
         showAlert("Compra confirmada con éxito. Total: $" + total);
     }
