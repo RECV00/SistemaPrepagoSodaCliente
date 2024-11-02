@@ -84,7 +84,7 @@ public class UIServiceRequestController {
             return; // No enviar solicitud si no hay selección
         }
 
-        connectionManager.sendMessage("LOAD_DISHES," + diaSeleccionado + "," + horarioSeleccionado);
+        connectionManager.sendMessage("LOAD_DISHES" +","+ diaSeleccionado + "," + horarioSeleccionado);
         listenForServerMessages(); // Escuchar mensajes del servidor después de enviar la solicitud
     }
 
