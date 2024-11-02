@@ -111,7 +111,10 @@ public class UIServiceRequestController {
             }
         });
     }
-
+    @FXML
+    private void SaveDishes() {
+    	System.out.print("Eviando pedido");
+    }
     @FXML
     private void confirmPurchase() {
         List<Dishe> selectedDishes = dishesList.filtered(dish -> dish.getSelect().isSelected());
