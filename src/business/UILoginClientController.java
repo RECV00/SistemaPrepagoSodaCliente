@@ -64,13 +64,18 @@ public class UILoginClientController {
             return;
         }
 
-        connectionManager = new ConnectionManager(serverIP);
-        if (connectionManager.connect()) {
-            connectionManager.sendLogin(userID, password);
-            new Thread(this::listenForServerMessages).start();
-        } else {
-            updateResponse("Error de conexión con el servidor.");
-        }
+        // Intentar establecer la conexión y enviar credenciales en un hilo separado.
+        new Thread(() -> {
+            connectionManager = new ConnectionManager(serverIP);
+            if (connectionManager.connect()) {
+                // Enviar las credenciales al servidor.
+                connectionManager.sendLogin(userID, password);
+                // Escuchar la respuesta del servidor.
+                listenForServerMessages();
+            } else {
+                updateResponse("Error de conexión con el servidor.");
+            }
+        }).start();
     }
 
     private void listenForServerMessages() {
@@ -82,6 +87,10 @@ public class UILoginClientController {
             }
         } catch (IOException e) {
             System.out.println("Error al recibir datos del servidor: " + e.getMessage());
+            updateResponse("Error al recibir datos del servidor.");
+        } finally {
+            // Asegúrate de cerrar la conexión si se sale del bucle.
+            connectionManager.close();
         }
     }
 
