@@ -14,7 +14,7 @@ import java.util.List;
 public class UIServiceRequestController {
 
 	private ConnectionManager connectionManager;
-    private String userCedula;
+    private String userID;
     
     @FXML
     private ComboBox<String> cbDiaReservacion;
@@ -39,15 +39,16 @@ public class UIServiceRequestController {
 
     private ObservableList<Dishe> dishesList;
 
-    public void initializeData(String userID, String hostServer) {
-        this.userCedula = userID;
+    public void initializeData(String userID, ConnectionManager connectionManager) {
+        this.userID = userID;
+        this.connectionManager = connectionManager; // Asignar el ConnectionManager proporcionado
+        initialize();  // Inicializar la interfaz gráfica
 
-        connectionManager = new ConnectionManager(hostServer);
         new Thread(() -> {
             if (connectionManager.connect()) {
                 Platform.runLater(this::setupTableAndData);
             } else {
-                Platform.runLater(() -> showAlert("No se pudo conectar al SODA."));
+                Platform.runLater(() -> showAlert("No se pudo conectar al servidor de SODA."));
             }
         }).start();
     }
@@ -106,7 +107,7 @@ public class UIServiceRequestController {
             return;
         }
 
-        connectionManager.sendReservationRequest(diaSeleccionado, horarioSeleccionado);
+        connectionManager.sendMessage("REQUEST_RESERVATION," + diaSeleccionado + "," + horarioSeleccionado);
     }
 
     @FXML
@@ -116,16 +117,18 @@ public class UIServiceRequestController {
             showAlert("Por favor, seleccione al menos un alimento.");
             return;
         }
+
         double total = 0;
-        StringBuilder request = new StringBuilder("PURCHASE," + userCedula); // Incluye el userID al inicio del mensaje
+        StringBuilder request = new StringBuilder("PURCHASE," + userID); // Incluye el userID al inicio del mensaje
 
         for (Dishe dish : selectedDishes) {
             request.append(",").append(dish.getName());
             total += dish.getPrice();
         }
         request.append(",").append(total);
-        // Envía el mensaje de compra al servidor
+
         connectionManager.sendMessage(request.toString());
+        showAlert("Compra confirmada con éxito. Total: $" + total);
     }
 
     @FXML

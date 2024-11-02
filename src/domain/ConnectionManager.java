@@ -15,15 +15,15 @@ public class ConnectionManager {
     private BufferedReader entrada;
     private Socket socket;
     private boolean isConnected = false;
-    
+
     public ConnectionManager(String hostServer) {
         this.hostServer = hostServer;
     }
-    
+
     public String getServerIP() {
         return hostServer;
     }
-    
+
     public boolean connect() {
         try {
             socket = new Socket(hostServer, PORT);
@@ -43,7 +43,6 @@ public class ConnectionManager {
         }
     }
 
-  
     public BufferedReader getEntrada() {
         return entrada;
     }
@@ -57,6 +56,7 @@ public class ConnectionManager {
             salida.println(message);
         }
     }
+
     public String receiveMessage() {
         try {
             if (isConnected && entrada != null) {
@@ -68,27 +68,16 @@ public class ConnectionManager {
         return null;
     }
 
-    // Método para enviar una solicitud de reservación al servidor
-    public void sendReservationRequest(String dia, String horario) {
-        String message = "LOAD_DISHES," + dia + "," + horario;
-        sendMessage(message);
-    }
-
    
     public void close() {
         try {
             isConnected = false;
-            if (salida != null) {
-                salida.close();
-            }
-            if (entrada != null) {
-                entrada.close();
-            }
-            if (socket != null) {
-                socket.close();
-            }
+            if (salida != null) salida.close();
+            if (entrada != null) entrada.close();
+            if (socket != null) socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    
     }
 }

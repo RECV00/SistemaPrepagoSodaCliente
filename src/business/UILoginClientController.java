@@ -3,7 +3,7 @@ package business;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label; // Para mostrar mensajes
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import domain.ConnectionManager;
 
-public class UILoginController {
+public class UILoginClientController {
 
     private ConnectionManager connectionManager;
 
@@ -27,7 +27,7 @@ public class UILoginController {
     @FXML
     private TextField tfVisiblePassword;
     @FXML
-    private TextField tfServerIP; 
+    private TextField tfServerIP;
     @FXML
     private Button bTogglePassword;
     @FXML
@@ -35,7 +35,6 @@ public class UILoginController {
    
     private boolean isPasswordVisible = false;
 
-    // Etiqueta para mostrar mensajes de respuesta
     @FXML
     private Label lblResponse;
 
@@ -58,14 +57,14 @@ public class UILoginController {
     private void onLogin() {
         String userID = tfID.getText().trim();
         String password = tfPassword.getText();
-        String serverIP = tfServerIP.getText().trim(); // Obtiene la IP ingresada
+        String serverIP = tfServerIP.getText().trim();
 
         if (userID.isEmpty() || password.isEmpty() || serverIP.isEmpty()) {
             updateResponse("Por favor, complete todos los campos.");
             return;
         }
 
-        connectionManager = new ConnectionManager(serverIP); // Pasa la IP al ConnectionManager
+        connectionManager = new ConnectionManager(serverIP);
         if (connectionManager.connect()) {
             connectionManager.sendLogin(userID, password);
             new Thread(this::listenForServerMessages).start();
@@ -89,13 +88,19 @@ public class UILoginController {
     private void processServerMessage(String mensajeServidor) {
         Platform.runLater(() -> {
             String[] parts = mensajeServidor.split(",");
-
             if (parts.length > 0) {
-                String status = parts[0];
-                if ("SUCCESS".equals(status)) {
-                    openServiceRequestWindow(parts[1]);
-                } else {
-                    updateResponse("Autenticación fallida: " + parts[1]);
+                switch (parts[0]) {
+                    case "SUCCESS":
+                        if (parts.length > 1) {
+                            openServiceRequestWindow(parts[1]);
+                        }
+                        break;
+                    case "FAILURE":
+                        updateResponse("Autenticación fallida: " + (parts.length > 1 ? parts[1] : "Error desconocido"));
+                        break;
+                    default:
+                        updateResponse("Respuesta desconocida del servidor: " + mensajeServidor);
+                        break;
                 }
             }
         });
@@ -105,17 +110,14 @@ public class UILoginController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/presentation/UIServiceRequest.fxml"));
             Parent root = loader.load();
-
-            // Obtener el controlador de la ventana de solicitud de servicio
             UIServiceRequestController controller = loader.getController();
-            // Pasar el userID y el serverIP al controlador
-            controller.initializeData(userID, connectionManager.getServerIP());
-            // Mostrar la nueva ventana
+            controller.initializeData(userID, connectionManager);
+
             Stage stage = new Stage();
             stage.setTitle("Service Request");
             stage.setScene(new Scene(root));
             stage.show();
-            // Cerrar la ventana de inicio de sesión actual
+
             Stage currentStage = (Stage) bLogin.getScene().getWindow();
             currentStage.close();
         } catch (IOException e) {
