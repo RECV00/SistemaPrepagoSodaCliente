@@ -176,7 +176,7 @@ public class UIServiceRequestController {
         for (int i = 1; i < parts.length; i += 2) {
             String name = parts[i];
             String price = parts[i + 1];
-            String state = " "; // Estado inicial
+            String state = "Pendiente"; // Estado inicial
             List<String> dishData = new ArrayList<>();
             dishData.add(name);
             dishData.add(price);
