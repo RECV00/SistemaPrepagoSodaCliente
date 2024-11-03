@@ -41,7 +41,7 @@ public class UIServiceRequestController {
     @FXML
     private TableColumn<List<String>, CheckBox> colSelection;
     @FXML
-    private TableColumn<List<String>, String> colQuantity;
+    private TableColumn<List<String>, Spinner<Integer>> colQuantity; 
     @FXML
     private TableColumn<List<String>, String> colState;
     @FXML
@@ -72,10 +72,11 @@ public class UIServiceRequestController {
         checkBoxes = new ArrayList<>();
         tableDishes.setItems(dishesList);
 
-        // Configura las columnas de la tabla
+        // Configuración de columnas de la tabla
         colDishes.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get(0)));
         colPrice.setCellValueFactory(data -> new SimpleStringProperty("$" + data.getValue().get(1)));
-
+        
+        // Configuración de la columna de selección
         colSelection.setCellFactory(col -> new TableCell<>() {
             private final CheckBox checkBox = new CheckBox();
 
@@ -88,37 +89,37 @@ public class UIServiceRequestController {
                     int index = getIndex();
                     if (index >= 0 && index < dishesList.size()) {
                         checkBox.setSelected(checkBoxes.get(index).isSelected());
-                        checkBoxes.set(index, checkBox); // Actualiza el CheckBox correspondiente
+                        checkBoxes.set(index, checkBox);
                         setGraphic(checkBox);
                     }
                 }
             }
         });
 
-        // Configura la columna de cantidad
-        colQuantity.setCellFactory(col -> new TableCell<List<String>, String>() {
-            private final TextField textField = new TextField();
+        // Configuración para colQuantity usando Spinner
+        colQuantity.setCellFactory(col -> new TableCell<>() {
+            private final Spinner<Integer> spinner = new Spinner<>(1, 100, 1);
 
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setGraphic(null);
-                } else {
-                    textField.setText(item);
-                    setGraphic(textField);
-                    textField.setOnKeyReleased(e -> {
-                        commitEdit(textField.getText()); // Commitear el nuevo valor al editar
-                    });
-                }
+            {
+                spinner.setEditable(true);
+                spinner.valueProperty().addListener((obs, oldValue, newValue) -> {
+                    if (getIndex() >= 0 && getIndex() < dishesList.size()) {
+                        dishesList.get(getIndex()).set(3, String.valueOf(newValue)); // Actualizar cantidad
+                    }
+                });
             }
 
             @Override
-            public void commitEdit(String newValue) {
-                super.commitEdit(newValue);
-                if (getTableRow() != null && getTableRow().getItem() != null) {
-                    List<String> rowData = getTableRow().getItem();
-                    rowData.set(3, newValue); // Actualiza la cantidad en la lista de datos
+            protected void updateItem(Spinner<Integer> item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    int index = getIndex();
+                    if (index >= 0 && index < dishesList.size()) {
+                        setGraphic(spinner);
+                        spinner.getValueFactory().setValue(Integer.parseInt(dishesList.get(index).get(3)));
+                    }
                 }
             }
         });
@@ -129,6 +130,7 @@ public class UIServiceRequestController {
         cbDayReservation.setOnAction(e -> loadDishes());
         Tipo.selectedToggleProperty().addListener((observable, oldValue, newValue) -> loadDishes());
     }
+
     private void setupTableAndData() {
         requestDishList();
     }
@@ -140,26 +142,26 @@ public class UIServiceRequestController {
     }
 
     private void loadDishes() {
-        String diaSeleccionado = cbDayReservation.getValue();
-        String horarioSeleccionado = rbBreakfrast.isSelected() ? "Desayuno" : "Almuerzo";
+        String selectedDay = cbDayReservation.getValue();
+        String selectedMeal = rbBreakfrast.isSelected() ? "Desayuno" : "Almuerzo";
 
-        connectionManager.sendMessage(LOAD_DISHES_REQUEST + "," + diaSeleccionado + "," + horarioSeleccionado);
-        listenForDishListResponse(); // Escucha solo la respuesta de la lista de platillos
+        connectionManager.sendMessage(LOAD_DISHES_REQUEST + "," + selectedDay + "," + selectedMeal);
+        listenForDishListResponse();
     }
 
     private void listenForDishListResponse() {
         new Thread(() -> {
-            String mensajeServidor;
-            while ((mensajeServidor = connectionManager.receiveMessage()) != null) {
-                processDishListResponse(mensajeServidor);
+            String serverMessage;
+            while ((serverMessage = connectionManager.receiveMessage()) != null) {
+                processDishListResponse(serverMessage);
             }
             Platform.runLater(() -> showAlert("Conexión con el servidor finalizada."));
         }).start();
     }
 
-    private void processDishListResponse(String mensajeServidor) {
+    private void processDishListResponse(String serverMessage) {
         Platform.runLater(() -> {
-            String[] parts = mensajeServidor.split(",");
+            String[] parts = serverMessage.split(",");
             if (DISH_LIST_RESPONSE.equals(parts[0])) {
                 updateDishesTable(parts);
             }
@@ -174,15 +176,17 @@ public class UIServiceRequestController {
         for (int i = 1; i < parts.length; i += 2) {
             String name = parts[i];
             String price = parts[i + 1];
-            String state = "Pendiente"; // Estado inicial
+            String state = " "; // Estado inicial
             List<String> dishData = new ArrayList<>();
             dishData.add(name);
             dishData.add(price);
             dishData.add(state);
-            dishesList.add(dishData); // Agregar el List<String> a la lista observable
-            checkBoxes.add(new CheckBox()); // Añadir un CheckBox correspondiente a la fila
+            dishData.add("1"); // Cantidad inicial como "1"
+            dishesList.add(dishData);
+            checkBoxes.add(new CheckBox());
         }
     }
+    
     @FXML
     private void confirmPurchase() {
         StringBuilder request = new StringBuilder(PURCHASE_REQUEST + "," + userID);
@@ -193,20 +197,13 @@ public class UIServiceRequestController {
             if (checkBoxes.get(i).isSelected()) {
                 hasSelection = true;
                 List<String> dishData = dishesList.get(i);
-                String dishName = dishData.get(0); // Nombre del platillo
-                String dishPrice = dishData.get(1).replace("$", ""); // Precio del platillo sin el símbolo de dólar
-                
-                // Obtener la cantidad ingresada
-                TextField quantityField = (TextField) tableDishes.getColumns().get(2).getCellObservableValue(i).getValue();
-                String quantityText = quantityField.getText();
-                int quantity = quantityText.isEmpty() ? 1 : Integer.parseInt(quantityText); // Default a 1 si está vacío
-                
-                // Calcular el total para este platillo
-                double dishTotal = quantity * Double.parseDouble(dishPrice);
+                String dishName = dishData.get(0);
+                String dishPrice = dishData.get(1).replace("$", "");
+                int quantity = Integer.parseInt(dishData.get(3));
 
-                // Agregar nombre, cantidad y total a la solicitud
+                double dishTotal = quantity * Double.parseDouble(dishPrice);
                 request.append(",").append(dishName).append(",").append(quantity).append(",").append(dishTotal);
-                total += dishTotal; // Sumar al total general
+                total += dishTotal;
             }
         }
 
@@ -215,10 +212,9 @@ public class UIServiceRequestController {
             return;
         }
 
-        // Agregar total general a la solicitud
         request.append(",").append(total);
         connectionManager.sendMessage(request.toString());
-        listenForOrderStatusResponse(); // Escuchar la respuesta de estado de la orden
+        listenForOrderStatusResponse();
     }
 
     private void listenForOrderStatusResponse() {
@@ -242,21 +238,20 @@ public class UIServiceRequestController {
     private void updateDishStatesFromOrderStatus(String[] parts) {
         for (int i = 1; i < parts.length; i += 2) {
             String name = parts[i];
-            String state = parts[i + 1]; // Obtener el estado completo
+            String state = parts[i + 1];
             updateDishState(name, state);
         }
     }
 
     private void updateDishState(String name, String state) {
         for (List<String> dishData : dishesList) {
-            if (dishData.get(0).equals(name)) { // Verifica si el nombre coincide
-                dishData.set(2, state); // Actualiza el estado en la lista
+            if (dishData.get(0).equals(name)) {
+                dishData.set(2, state);
                 break;
             }
         }
-        tableDishes.refresh(); // Refresca la tabla para mostrar el nuevo estado
+        tableDishes.refresh();
     }
-
     @FXML
     private void closeConnectionOnExit() {
         if (connectionManager != null) {
