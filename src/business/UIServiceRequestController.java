@@ -212,7 +212,7 @@ public class UIServiceRequestController {
             return;
         }
 
-        request.append(",").append(total);
+       // request.append(",").append(total);
         connectionManager.sendMessage(request.toString());
         listenForOrderStatusResponse();
     }
