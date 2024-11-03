@@ -41,6 +41,8 @@ public class UIServiceRequestController {
     @FXML
     private TableColumn<List<String>, CheckBox> colSelection;
     @FXML
+    private TableColumn<List<String>, String> colQuantity;
+    @FXML
     private TableColumn<List<String>, String> colState;
     @FXML
     private Button bBack;
@@ -93,13 +95,40 @@ public class UIServiceRequestController {
             }
         });
 
+        // Configura la columna de cantidad
+        colQuantity.setCellFactory(col -> new TableCell<List<String>, String>() {
+            private final TextField textField = new TextField();
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    textField.setText(item);
+                    setGraphic(textField);
+                    textField.setOnKeyReleased(e -> {
+                        commitEdit(textField.getText()); // Commitear el nuevo valor al editar
+                    });
+                }
+            }
+
+            @Override
+            public void commitEdit(String newValue) {
+                super.commitEdit(newValue);
+                if (getTableRow() != null && getTableRow().getItem() != null) {
+                    List<String> rowData = getTableRow().getItem();
+                    rowData.set(3, newValue); // Actualiza la cantidad en la lista de datos
+                }
+            }
+        });
+
         colState.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get(2)));
 
         cbDayReservation.getItems().addAll("Lunes", "Martes", "Miércoles", "Jueves", "Viernes");
         cbDayReservation.setOnAction(e -> loadDishes());
         Tipo.selectedToggleProperty().addListener((observable, oldValue, newValue) -> loadDishes());
     }
-    
     private void setupTableAndData() {
         requestDishList();
     }

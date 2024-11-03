@@ -22,24 +22,27 @@
         <!-- Selección de Horario (Desayuno o Almuerzo) -->
         <Label layoutX="20.0" layoutY="97.0" text="Horario de la reserva:" />
         <RadioButton fx:id="rbBreakfrast" layoutX="149.0" layoutY="97.0" mnemonicParsing="false" text="Desayuno">
-			<toggleGroup>
-				<ToggleGroup fx:id="Tipo" />
-			</toggleGroup>
-         <font>
-            <Font name="System Bold Italic" size="12.0" />
-         </font>
-		</RadioButton>
-		<RadioButton fx:id="rbLunch" layoutX="239.0" layoutY="97.0" mnemonicParsing="false" text="Almuerzo" toggleGroup="$Tipo">
-         <font>
-            <Font name="System Bold Italic" size="12.0" />
-         </font></RadioButton>
+            <toggleGroup>
+                <ToggleGroup fx:id="Tipo" />
+            </toggleGroup>
+            <font>
+                <Font name="System Bold Italic" size="12.0" />
+            </font>
+        </RadioButton>
+        <RadioButton fx:id="rbLunch" layoutX="239.0" layoutY="97.0" mnemonicParsing="false" text="Almuerzo" toggleGroup="$Tipo">
+            <font>
+                <Font name="System Bold Italic" size="12.0" />
+            </font>
+        </RadioButton>
+        
         <!-- Tabla de Platos -->
-        <TableView fx:id="tableDishes" layoutX="55.0" layoutY="137.0" opacity="0.59" prefHeight="207.0" prefWidth="605.0">
+        <TableView fx:id="tableDishes" layoutX="13.0" layoutY="140.0" opacity="0.59" prefHeight="207.0" prefWidth="689.0">
             <columns>
                 <TableColumn fx:id="colDishes" prefWidth="182.0" text="Alimento" />
                 <TableColumn fx:id="colPrice" prefWidth="144.0" text="Precio" />
                 <TableColumn fx:id="colSelection" prefWidth="139.0" text="Seleccionar" />
-            <TableColumn fx:id="colState" prefWidth="138.0" text="Estado" />
+                <TableColumn fx:id="colQuantity" prefWidth="100.0" text="Cantidad" /> <!-- Nueva columna de cantidad -->
+                <TableColumn fx:id="colState" prefWidth="138.0" text="Estado" />
             </columns>
         </TableView>
 
