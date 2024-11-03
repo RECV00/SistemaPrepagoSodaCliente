@@ -23,28 +23,32 @@ public class UIServiceRequestController {
     private static final String DISH_LIST_RESPONSE = "DISH_LIST";
     private static final String LOAD_DISHES_REQUEST = "LOAD_DISHES";
     private static final String PURCHASE_REQUEST = "PURCHASE";
-    
+    private static final String ORDER_STATUS_RESPONSE = "ORDER_STATUS";
     @FXML
-    private ComboBox<String> cbDiaReservacion;
+    private ComboBox<String> cbDayReservation;
     @FXML
-    private RadioButton rbDesayuno;
+    private RadioButton rbBreakfrast;
     @FXML
     private ToggleGroup Tipo;
     @FXML
-    private RadioButton rbAlmuerzo;
+    private RadioButton rbLunch;
     @FXML
-    private TableView<String> tableDishes;
+    private TableView<List<String>> tableDishes;
     @FXML
-    private TableColumn<String, String> colAlimento;
+    private TableColumn<List<String>, String> colDishes;
     @FXML
-    private TableColumn<String, CheckBox> colSolicitar;
+    private TableColumn<List<String>, String> colPrice;
+    @FXML
+    private TableColumn<List<String>, CheckBox> colSelection;
+    @FXML
+    private TableColumn<List<String>, String> colState;
     @FXML
     private Button bBack;
     @FXML
     private Button bSendOrder;
 
-    private ObservableList<String> dishesList;
-    private List<CheckBox> checkBoxes;  
+    private ObservableList<List<String>> dishesList; // Cambiar a ObservableList de List<String>
+    private List<CheckBox> checkBoxes;
 
     public void initializeData(String userID, ConnectionManager connectionManager) {
         this.userID = userID;
@@ -66,8 +70,11 @@ public class UIServiceRequestController {
         checkBoxes = new ArrayList<>();
         tableDishes.setItems(dishesList);
 
-        colAlimento.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
-        colSolicitar.setCellFactory(col -> new TableCell<>() {
+        // Configura las columnas de la tabla
+        colDishes.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get(0)));
+        colPrice.setCellValueFactory(data -> new SimpleStringProperty("$" + data.getValue().get(1)));
+
+        colSelection.setCellFactory(col -> new TableCell<>() {
             private final CheckBox checkBox = new CheckBox();
 
             @Override
@@ -77,83 +84,88 @@ public class UIServiceRequestController {
                     setGraphic(null);
                 } else {
                     int index = getIndex();
-                    if (index >= 0 && index < checkBoxes.size()) {
-                        setGraphic(checkBoxes.get(index));
+                    if (index >= 0 && index < dishesList.size()) {
+                        checkBox.setSelected(checkBoxes.get(index).isSelected());
+                        checkBoxes.set(index, checkBox); // Actualiza el CheckBox correspondiente
+                        setGraphic(checkBox);
                     }
                 }
             }
         });
 
-        cbDiaReservacion.getItems().addAll("Lunes", "Martes", "Miércoles", "Jueves", "Viernes");
-        // Agregar listeners para cambios en el ComboBox y los RadioButtons
-        cbDiaReservacion.setOnAction(e -> loadDishes());
+        colState.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get(2)));
+
+        cbDayReservation.getItems().addAll("Lunes", "Martes", "Miércoles", "Jueves", "Viernes");
+        cbDayReservation.setOnAction(e -> loadDishes());
         Tipo.selectedToggleProperty().addListener((observable, oldValue, newValue) -> loadDishes());
     }
     
     private void setupTableAndData() {
-        requestDishList(); 
+        requestDishList();
     }
+
     private void requestDishList() {
-       
-        if (cbDiaReservacion.getValue() != null && Tipo.getSelectedToggle() != null) {
-            loadDishes(); // Llama a loadDishes solo si ambas selecciones son válidas
+        if (cbDayReservation.getValue() != null && Tipo.getSelectedToggle() != null) {
+            loadDishes();
         }
     }
 
     private void loadDishes() {
-        String diaSeleccionado = cbDiaReservacion.getValue();
-        String horarioSeleccionado = rbDesayuno.isSelected() ? "Desayuno" : "Almuerzo";
+        String diaSeleccionado = cbDayReservation.getValue();
+        String horarioSeleccionado = rbBreakfrast.isSelected() ? "Desayuno" : "Almuerzo";
 
         connectionManager.sendMessage(LOAD_DISHES_REQUEST + "," + diaSeleccionado + "," + horarioSeleccionado);
-        listenForServerMessages(); 
+        listenForDishListResponse(); // Escucha solo la respuesta de la lista de platillos
     }
 
-    private void listenForServerMessages() {
+    private void listenForDishListResponse() {
         new Thread(() -> {
             String mensajeServidor;
             while ((mensajeServidor = connectionManager.receiveMessage()) != null) {
-            	System.out.print(mensajeServidor);
-                processServerMessage(mensajeServidor);
+                processDishListResponse(mensajeServidor);
             }
             Platform.runLater(() -> showAlert("Conexión con el servidor finalizada."));
         }).start();
     }
-    private void processServerMessage(String mensajeServidor) {
+
+    private void processDishListResponse(String mensajeServidor) {
         Platform.runLater(() -> {
             String[] parts = mensajeServidor.split(",");
             if (DISH_LIST_RESPONSE.equals(parts[0])) {
-                dishesList.clear(); // Limpiar la lista actual de platos
-                checkBoxes.clear(); // Limpiar la lista de CheckBoxes antes de agregar nuevos
-
-                for (int i = 1; i < parts.length; i += 2) {
-                    String name = parts[i];
-                    String price = parts[i + 1];
-                    String dishInfo = name + " - $" + price;
-                    dishesList.add(dishInfo);
-                    checkBoxes.add(new CheckBox()); // Añadir un CheckBox correspondiente
-                }
+                updateDishesTable(parts);
             }
         });
     }
 
-    @FXML
-    private void SaveDishes() {
-    	System.out.print("Eviando pedido");
+
+    private void updateDishesTable(String[] parts) {
+        dishesList.clear();
+        checkBoxes.clear();
+
+        for (int i = 1; i < parts.length; i += 2) {
+            String name = parts[i];
+            String price = parts[i + 1];
+            String state = "Pendiente"; // Estado inicial
+            List<String> dishData = new ArrayList<>();
+            dishData.add(name);
+            dishData.add(price);
+            dishData.add(state);
+            dishesList.add(dishData); // Agregar el List<String> a la lista observable
+            checkBoxes.add(new CheckBox()); // Añadir un CheckBox correspondiente a la fila
+        }
     }
     @FXML
     private void confirmPurchase() {
-        StringBuilder request = new StringBuilder(PURCHASE_REQUEST + userID);
+        StringBuilder request = new StringBuilder(PURCHASE_REQUEST + "," + userID);
         double total = 0;
         boolean hasSelection = false;
 
         for (int i = 0; i < dishesList.size(); i++) {
             if (checkBoxes.get(i).isSelected()) {
                 hasSelection = true;
-                String[] dishDetails = dishesList.get(i).split(" - \\$");
-                String name = dishDetails[0];
-                double price = Double.parseDouble(dishDetails[1]);
-                request.append(",").append(name);
-                total += price;
+                List<String> dishData = dishesList.get(i);
+                request.append(",").append(dishData.get(0)).append(",").append(dishData.get(1)); // Agregar nombre y precio al servidor
+                total += Double.parseDouble(dishData.get(1).replace("$", "")); // Asegúrate de manejar el símbolo de dólar
             }
         }
 
@@ -164,7 +176,43 @@ public class UIServiceRequestController {
 
         request.append(",").append(total);
         connectionManager.sendMessage(request.toString());
-        showAlert("Compra confirmada con éxito. Total: $" + total);
+        listenForOrderStatusResponse(); // Escucha la respuesta de estado de la orden
+    }
+
+    private void listenForOrderStatusResponse() {
+        new Thread(() -> {
+            String mensajeServidor;
+            while ((mensajeServidor = connectionManager.receiveMessage()) != null) {
+                processOrderStatusResponse(mensajeServidor);
+            }
+        }).start();
+    }
+
+    private void processOrderStatusResponse(String mensajeServidor) {
+        Platform.runLater(() -> {
+            String[] parts = mensajeServidor.split(",");
+            if (ORDER_STATUS_RESPONSE.equals(parts[0])) {
+                updateDishStatesFromOrderStatus(parts);
+            }
+        });
+    }
+
+    private void updateDishStatesFromOrderStatus(String[] parts) {
+        for (int i = 1; i < parts.length; i += 2) {
+            String name = parts[i];
+            String state = parts[i + 1]; // Obtener el estado completo
+            updateDishState(name, state);
+        }
+    }
+
+    private void updateDishState(String name, String state) {
+        for (List<String> dishData : dishesList) {
+            if (dishData.get(0).equals(name)) { // Verifica si el nombre coincide
+                dishData.set(2, state); // Actualiza el estado en la lista
+                break;
+            }
+        }
+        tableDishes.refresh(); // Refresca la tabla para mostrar el nuevo estado
     }
 
     @FXML
@@ -179,24 +227,24 @@ public class UIServiceRequestController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
     @FXML
     public void returnLogin() {
-    	closeWindows();
+        closeWindows();
     }
-   	public void closeWindows() {
-   		
-   		try {
-   			 FXMLLoader loader = new FXMLLoader (getClass().getResource("/presentation/UILoginClient.fxml"));
-   	        Parent root = loader.load();
-   			Scene scene = new Scene(root);		
-   	        Stage stage = new Stage();
-   	        stage.setScene(scene);
-   	        stage.show();			        
-   	        Stage temp = (Stage) bBack.getScene().getWindow();
-   	        temp.close();
-   		} catch (IOException e) {
-   			// TODO Auto-generated catch block
-   			e.printStackTrace();
-   		}
-   	}
+
+    public void closeWindows() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/presentation/UILoginClient.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.show();
+            Stage temp = (Stage) bBack.getScene().getWindow();
+            temp.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
