@@ -164,8 +164,20 @@ public class UIServiceRequestController {
             if (checkBoxes.get(i).isSelected()) {
                 hasSelection = true;
                 List<String> dishData = dishesList.get(i);
-                request.append(",").append(dishData.get(0)).append(",").append(dishData.get(1)); // Agregar nombre y precio al servidor
-                total += Double.parseDouble(dishData.get(1).replace("$", "")); // Asegúrate de manejar el símbolo de dólar
+                String dishName = dishData.get(0); // Nombre del platillo
+                String dishPrice = dishData.get(1).replace("$", ""); // Precio del platillo sin el símbolo de dólar
+                
+                // Obtener la cantidad ingresada
+                TextField quantityField = (TextField) tableDishes.getColumns().get(2).getCellObservableValue(i).getValue();
+                String quantityText = quantityField.getText();
+                int quantity = quantityText.isEmpty() ? 1 : Integer.parseInt(quantityText); // Default a 1 si está vacío
+                
+                // Calcular el total para este platillo
+                double dishTotal = quantity * Double.parseDouble(dishPrice);
+
+                // Agregar nombre, cantidad y total a la solicitud
+                request.append(",").append(dishName).append(",").append(quantity).append(",").append(dishTotal);
+                total += dishTotal; // Sumar al total general
             }
         }
 
@@ -174,9 +186,10 @@ public class UIServiceRequestController {
             return;
         }
 
+        // Agregar total general a la solicitud
         request.append(",").append(total);
         connectionManager.sendMessage(request.toString());
-        listenForOrderStatusResponse(); // Escucha la respuesta de estado de la orden
+        listenForOrderStatusResponse(); // Escuchar la respuesta de estado de la orden
     }
 
     private void listenForOrderStatusResponse() {
