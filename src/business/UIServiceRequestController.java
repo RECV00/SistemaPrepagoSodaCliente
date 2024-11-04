@@ -229,10 +229,28 @@ public class UIServiceRequestController {
     private void processOrderStatusResponse(String mensajeServidor) {
         Platform.runLater(() -> {
             String[] parts = mensajeServidor.split(",");
-            if (ORDER_STATUS_RESPONSE.equals(parts[0])) {
-                updateDishStatesFromOrderStatus(parts);
+            
+            switch (parts[0]) {
+                case "INSUFFICIENT_FUNDS":
+                    showAlert("Fondos insuficientes", "No tienes saldo suficiente para realizar la compra.");
+                    break;
+                
+                case ORDER_STATUS_RESPONSE:
+                    updateDishStatesFromOrderStatus(parts);
+                    break;
+
+                default:
+                    showAlert("Error de respuesta", "Respuesta desconocida del servidor.");
+                    break;
             }
         });
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private void updateDishStatesFromOrderStatus(String[] parts) {
