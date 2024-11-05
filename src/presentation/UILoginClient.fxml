@@ -11,20 +11,20 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: green;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="business.UILoginClientController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="419.0" prefWidth="600.0" style="-fx-background-color: #820000;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="business.UILoginClientController">
     <children>
         <!-- Background styling -->
         <StackPane layoutX="100.0" layoutY="50.0" prefHeight="300" prefWidth="400" style="-fx-background-radius: 10; -fx-background-color: #ffffff; -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 10, 0, 0, 10);">
             <children>
                 <VBox alignment="CENTER" prefHeight="300" prefWidth="400" spacing="10">
                     <!-- Circle for the logo -->
-                    <StackPane alignment="CENTER" prefHeight="137.0" prefWidth="400.0">
+                    <StackPane alignment="CENTER" prefHeight="155.0" prefWidth="406.0">
                         <Label style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px;" text="Logo" />
-                        <ImageView fitHeight="138.0" fitWidth="161.0">
-                            <image>
-                                <Image url="@../../imagen/Campus%20Sarapiqui.png" />
-                            </image>
-                        </ImageView>
+                  <ImageView fitHeight="156.0" fitWidth="161.0">
+                     <image>
+                        <Image url="@../../../../../../../Desktop/SistemaPrepagoSoda/media/logoUna.png" />
+                     </image>
+                  </ImageView>
                     </StackPane>
                     
                     <!-- Input fields -->
@@ -41,7 +41,7 @@
                     </HBox>
 
                     <!-- Login Button -->
-                    <Button fx:id="bLogin" onAction="#onLogin" style="-fx-background-color: #2A2E37; -fx-text-fill: #FFFFFF; -fx-background-radius: 20; -fx-pref-width: 100;" text="LOGIN" />
+                    <Button fx:id="bLogin" onAction="#onLogin" style="-fx-background-color: #820000; -fx-text-fill: #FFFFFF; -fx-background-radius: 20; -fx-pref-width: 100;" text="LOGIN" textFill="WHITE" />
 
                     <!-- Response Label -->
                     <Label fx:id="lblResponse" style="-fx-text-fill: red;" /> <!-- Este es el nuevo Label para mostrar mensajes -->

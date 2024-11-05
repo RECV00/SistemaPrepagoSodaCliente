@@ -10,33 +10,39 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="417.0" prefWidth="715.0" style="-fx-background-color: BD8F5C;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="business.UIServiceRequestController">
+<AnchorPane prefHeight="417.0" prefWidth="715.0" style="-fx-background-color: #820000;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="business.UIServiceRequestController">
     <children>
         <!-- Título -->
-        <Label layoutX="20.0" layoutY="10.0" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Servicio de Solicitud de Alimentos" />
+        <Label alignment="CENTER" prefHeight="35.0" prefWidth="715.0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: white;" text="Servicio de Solicitud de Alimentos" />
         
         <!-- Selección del Día de Reservación -->
-        <Label layoutX="20.0" layoutY="51.0" text="Día de Reservación:" />
-        <ComboBox fx:id="cbDayReservation" layoutX="139.0" layoutY="47.0" prefWidth="150.0" />
+        <Label layoutX="20.0" layoutY="51.0" text="Día de Reservación:" textFill="WHITE">
+         <font>
+            <Font size="18.0" />
+         </font></Label>
+        <ComboBox fx:id="cbDayReservation" layoutX="188.0" layoutY="52.0" prefWidth="150.0" />
 
         <!-- Selección de Horario (Desayuno o Almuerzo) -->
-        <Label layoutX="20.0" layoutY="97.0" text="Horario de la reserva:" />
-        <RadioButton fx:id="rbBreakfrast" layoutX="149.0" layoutY="97.0" mnemonicParsing="false" text="Desayuno">
+        <Label layoutX="20.0" layoutY="97.0" text="Horario de la Reserva:" textFill="WHITE">
+         <font>
+            <Font size="18.0" />
+         </font></Label>
+        <RadioButton fx:id="rbBreakfrast" layoutX="232.0" layoutY="98.0" mnemonicParsing="false" text="Desayuno" textFill="WHITE">
             <toggleGroup>
                 <ToggleGroup fx:id="Tipo" />
             </toggleGroup>
             <font>
-                <Font name="System Bold Italic" size="12.0" />
+                <Font name="System Bold Italic" size="14.0" />
             </font>
         </RadioButton>
-        <RadioButton fx:id="rbLunch" layoutX="239.0" layoutY="97.0" mnemonicParsing="false" text="Almuerzo" toggleGroup="$Tipo">
+        <RadioButton fx:id="rbLunch" layoutX="350.0" layoutY="101.0" mnemonicParsing="false" text="Almuerzo" textFill="#fffbfb" toggleGroup="$Tipo">
             <font>
-                <Font name="System Bold Italic" size="12.0" />
+                <Font name="System Bold Italic" size="14.0" />
             </font>
         </RadioButton>
         
         <!-- Tabla de Platos -->
-        <TableView fx:id="tableDishes" layoutX="13.0" layoutY="140.0" opacity="0.59" prefHeight="207.0" prefWidth="689.0">
+        <TableView fx:id="tableDishes" layoutX="13.0" layoutY="140.0" prefHeight="207.0" prefWidth="689.0" style="-fx-background-color: #820000;">
             <columns>
                 <TableColumn fx:id="colDishes" prefWidth="182.0" text="Alimento" />
                 <TableColumn fx:id="colPrice" prefWidth="144.0" text="Precio" />

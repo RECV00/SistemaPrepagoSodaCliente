@@ -74,7 +74,7 @@ public class UIServiceRequestController {
 
         // Configuración de columnas de la tabla
         colDishes.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get(0)));
-        colPrice.setCellValueFactory(data -> new SimpleStringProperty("$" + data.getValue().get(1)));
+        colPrice.setCellValueFactory(data -> new SimpleStringProperty("₡" + data.getValue().get(1)));
         
         // Configuración de la columna de selección
         colSelection.setCellFactory(col -> new TableCell<>() {
