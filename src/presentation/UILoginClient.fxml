@@ -11,42 +11,42 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="419.0" prefWidth="600.0" style="-fx-background-color: #820000;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="business.UILoginClientController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="504.0" prefWidth="611.0" style="-fx-background-color: #820000;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="business.UILoginClientController">
     <children>
         <!-- Background styling -->
         <StackPane layoutX="100.0" layoutY="50.0" prefHeight="300" prefWidth="400" style="-fx-background-radius: 10; -fx-background-color: #ffffff; -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 10, 0, 0, 10);">
-            <children>
+         <children>
                 <VBox alignment="CENTER" prefHeight="300" prefWidth="400" spacing="10">
                     <!-- Circle for the logo -->
                     <StackPane alignment="CENTER" prefHeight="155.0" prefWidth="406.0">
                         <Label style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px;" text="Logo" />
-                  <ImageView fitHeight="156.0" fitWidth="161.0">
-                     <image>
-                        <Image url="@../../../../../../../Desktop/SistemaPrepagoSoda/media/logoUna.png" />
-                     </image>
-                  </ImageView>
                     </StackPane>
+               <ImageView fitHeight="200.0" fitWidth="200.0">
+                  <image>
+                     <Image url="@../../imagen/logoUna.png" />
+                  </image>
+               </ImageView>
                     
-                    <!-- Input fields -->
+                          <!-- Input fields -->
                     <TextField fx:id="tfID" prefHeight="25.0" prefWidth="328.0" promptText="CEDULA" style="-fx-pref-width: 300; -fx-background-radius: 5;" />
-
+      
                     <!-- New IP Input Field -->
                     <TextField fx:id="tfServerIP" prefHeight="25.0" prefWidth="328.0" promptText="IP ADDRESS" style="-fx-pref-width: 300; -fx-background-radius: 5;" />
-
+      
                     <!-- Password Field with Toggle Button -->
                     <HBox alignment="CENTER_RIGHT" style="-fx-pref-width: 300;">
                         <PasswordField fx:id="tfPassword" prefHeight="25.0" prefWidth="325.0" promptText="CONTRASEÑA" style="-fx-pref-width: 300; -fx-background-radius: 5;" />
                         <TextField fx:id="tfVisiblePassword" managed="false" promptText="CONTRASEÑA" style="-fx-pref-width: 300; -fx-background-radius: 5;" visible="false" />
                         <Button fx:id="bTogglePassword" onAction="#togglePasswordVisibility" style="-fx-background-color: transparent;" text="👁" />
                     </HBox>
-
+      
                     <!-- Login Button -->
                     <Button fx:id="bLogin" onAction="#onLogin" style="-fx-background-color: #820000; -fx-text-fill: #FFFFFF; -fx-background-radius: 20; -fx-pref-width: 100;" text="LOGIN" textFill="WHITE" />
-
+      
                     <!-- Response Label -->
                     <Label fx:id="lblResponse" style="-fx-text-fill: red;" /> <!-- Este es el nuevo Label para mostrar mensajes -->
                 </VBox>
-            </children>
+         </children>
         </StackPane>
     </children>
 </AnchorPane>

@@ -19,7 +19,6 @@ import domain.ConnectionManager;
 public class UILoginClientController {
 
     private ConnectionManager connectionManager;
-
     @FXML
     private TextField tfID;
     @FXML
@@ -35,12 +34,10 @@ public class UILoginClientController {
     private boolean isPasswordVisible = false;
     @FXML
     private Label lblResponse;
-
     @FXML
     private void initialize() {
         tfVisiblePassword.textProperty().bindBidirectional(tfPassword.textProperty());
     }
-
     @FXML
     private void togglePasswordVisibility() {
         isPasswordVisible = !isPasswordVisible;
@@ -50,12 +47,11 @@ public class UILoginClientController {
         tfPassword.setManaged(!isPasswordVisible);
         bTogglePassword.setText(isPasswordVisible ? "🐄" : "👁");
     }
-
     @FXML
     private void onLogin() {
         String userID = tfID.getText().trim();
         String password = tfPassword.getText();
-        String serverIP = tfServerIP.getText().trim();
+        String serverIP = tfServerIP.getText();
 
         if (userID.isEmpty() || password.isEmpty() || serverIP.isEmpty()) {
             updateResponse("Por favor, complete todos los campos.");
@@ -65,6 +61,7 @@ public class UILoginClientController {
         // Intentar establecer la conexión y enviar credenciales en un hilo separado.
         new Thread(() -> {
             connectionManager = new ConnectionManager(serverIP);
+            System.out.print(serverIP);
             if (connectionManager.connect()) {
                 // Enviar las credenciales al servidor.
                 connectionManager.sendLogin(userID, password);
@@ -86,8 +83,7 @@ public class UILoginClientController {
         } catch (IOException e) {
             System.out.println("Error al recibir datos del servidor: " + e.getMessage());
             updateResponse("Error al recibir datos del servidor.");
-        } finally {
-            // Asegúrate de cerrar la conexión si se sale del bucle.
+        } finally {          
             connectionManager.close();
         }
     }
@@ -119,7 +115,7 @@ public class UILoginClientController {
             Parent root = loader.load();
             UIServiceRequestController controller = loader.getController();
             controller.initializeData(userID, connectionManager);
-
+            
             Stage stage = new Stage();
             stage.setTitle("Service Request");
             stage.setScene(new Scene(root));

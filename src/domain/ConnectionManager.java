@@ -9,8 +9,7 @@ import java.net.Socket;
 public class ConnectionManager {
 
 	private String hostServer;
-    private static final int PORT = 12359;
-
+    private static final int PORT = 12399;
     private PrintWriter salida;
     private BufferedReader entrada;
     private Socket socket;
@@ -19,11 +18,9 @@ public class ConnectionManager {
     public ConnectionManager(String hostServer) {
         this.hostServer = hostServer;
     }
-
     public String getServerIP() {
         return hostServer;
     }
-
     public boolean connect() {
         try {
             socket = new Socket(hostServer, PORT);
@@ -39,10 +36,9 @@ public class ConnectionManager {
 
     public void sendLogin(String userID, String password) {
         if (isConnected) {
-            salida.println("LOGIN" +","+ userID + "," + password);
+            salida.println("LOGIN"+","+ userID + "," +password);
         }
     }
-
     public BufferedReader getEntrada() {
         return entrada;
     }
