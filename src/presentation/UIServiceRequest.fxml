@@ -27,7 +27,7 @@
          <font>
             <Font size="18.0" />
          </font></Label>
-        <RadioButton fx:id="rbBreakfrast" layoutX="232.0" layoutY="98.0" mnemonicParsing="false" text="Desayuno" textFill="WHITE">
+        <RadioButton fx:id="rbBreakfrast" layoutX="229.0" layoutY="101.0" mnemonicParsing="false" text="Desayuno" textFill="WHITE">
             <toggleGroup>
                 <ToggleGroup fx:id="Tipo" />
             </toggleGroup>
@@ -35,7 +35,7 @@
                 <Font name="System Bold Italic" size="14.0" />
             </font>
         </RadioButton>
-        <RadioButton fx:id="rbLunch" layoutX="350.0" layoutY="101.0" mnemonicParsing="false" text="Almuerzo" textFill="#fffbfb" toggleGroup="$Tipo">
+        <RadioButton fx:id="rbLunch" layoutX="358.0" layoutY="101.0" mnemonicParsing="false" text="Almuerzo" textFill="#fffbfb" toggleGroup="$Tipo">
             <font>
                 <Font name="System Bold Italic" size="14.0" />
             </font>
