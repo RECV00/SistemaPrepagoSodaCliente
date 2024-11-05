@@ -66,7 +66,6 @@ public class UIServiceRequestController {
         }).start();
     }
     
-    @FXML
     private void initialize() {
         dishesList = FXCollections.observableArrayList();
         checkBoxes = new ArrayList<>();
@@ -99,7 +98,6 @@ public class UIServiceRequestController {
         // Configuración para colQuantity usando Spinner
         colQuantity.setCellFactory(col -> new TableCell<>() {
             private final Spinner<Integer> spinner = new Spinner<>(1, 100, 1);
-
             {
                 spinner.setEditable(true);
                 spinner.valueProperty().addListener((obs, oldValue, newValue) -> {
@@ -108,7 +106,6 @@ public class UIServiceRequestController {
                     }
                 });
             }
-
             @Override
             protected void updateItem(Spinner<Integer> item, boolean empty) {
                 super.updateItem(item, empty);
@@ -125,16 +122,13 @@ public class UIServiceRequestController {
         });
 
         colState.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get(2)));
-
         cbDayReservation.getItems().addAll("Lunes", "Martes", "Miércoles", "Jueves", "Viernes");
         cbDayReservation.setOnAction(e -> loadDishes());
         Tipo.selectedToggleProperty().addListener((observable, oldValue, newValue) -> loadDishes());
     }
-
     private void setupTableAndData() {
         requestDishList();
     }
-
     private void requestDishList() {
         if (cbDayReservation.getValue() != null && Tipo.getSelectedToggle() != null) {
             loadDishes();
@@ -148,7 +142,6 @@ public class UIServiceRequestController {
         connectionManager.sendMessage(LOAD_DISHES_REQUEST + "," + selectedDay + "," + selectedMeal);
         listenForDishListResponse();
     }
-
     private void listenForDishListResponse() {
         new Thread(() -> {
             String serverMessage;
@@ -158,8 +151,7 @@ public class UIServiceRequestController {
             Platform.runLater(() -> showAlert("Conexión con el servidor finalizada."));
         }).start();
     }
-
-    private void processDishListResponse(String serverMessage) {
+    private void processDishListResponse(String serverMessage) {//llenar la tabla
         Platform.runLater(() -> {
             String[] parts = serverMessage.split(",");
             if (DISH_LIST_RESPONSE.equals(parts[0])) {
@@ -169,10 +161,9 @@ public class UIServiceRequestController {
     }
 
 
-    private void updateDishesTable(String[] parts) {
+    private void updateDishesTable(String[] parts) {//aqui la llena
         dishesList.clear();
         checkBoxes.clear();
-
         for (int i = 1; i < parts.length; i += 2) {
             String name = parts[i];
             String price = parts[i + 1];
@@ -185,38 +176,29 @@ public class UIServiceRequestController {
             dishesList.add(dishData);
             checkBoxes.add(new CheckBox());
         }
-    }
-    
+    }  
     @FXML
     private void confirmPurchase() {
         StringBuilder request = new StringBuilder(PURCHASE_REQUEST + "," + userID);
-        double total = 0;
         boolean hasSelection = false;
-
         for (int i = 0; i < dishesList.size(); i++) {
             if (checkBoxes.get(i).isSelected()) {
                 hasSelection = true;
                 List<String> dishData = dishesList.get(i);
                 String dishName = dishData.get(0);
-                String dishPrice = dishData.get(1).replace("$", "");
+                String dishPrice = dishData.get(1).replace("₡", "");
                 int quantity = Integer.parseInt(dishData.get(3));
-
                 double dishTotal = quantity * Double.parseDouble(dishPrice);
                 request.append(",").append(dishName).append(",").append(quantity).append(",").append(dishTotal);
-                total += dishTotal;
             }
         }
-
         if (!hasSelection) {
             showAlert("Por favor, seleccione al menos un alimento.");
             return;
         }
-
-       // request.append(",").append(total);
         connectionManager.sendMessage(request.toString());
         listenForOrderStatusResponse();
     }
-
     private void listenForOrderStatusResponse() {
         new Thread(() -> {
             String mensajeServidor;
@@ -233,12 +215,10 @@ public class UIServiceRequestController {
             switch (parts[0]) {
                 case "INSUFFICIENT_FUNDS":
                     showAlert("Fondos insuficientes", "No tienes saldo suficiente para realizar la compra.");
-                    break;
-                
+                    break;              
                 case ORDER_STATUS_RESPONSE:
                     updateDishStatesFromOrderStatus(parts);
                     break;
-
                 default:
                     showAlert("Error de respuesta", "Respuesta desconocida del servidor.");
                     break;
@@ -252,7 +232,6 @@ public class UIServiceRequestController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
     private void updateDishStatesFromOrderStatus(String[] parts) {
         for (int i = 1; i < parts.length; i += 2) {
             String name = parts[i];
@@ -260,7 +239,6 @@ public class UIServiceRequestController {
             updateDishState(name, state);
         }
     }
-
     private void updateDishState(String name, String state) {
         for (List<String> dishData : dishesList) {
             if (dishData.get(0).equals(name)) {
@@ -276,7 +254,6 @@ public class UIServiceRequestController {
             connectionManager.close();
         }
     }
-
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(message);
